@@ -1,0 +1,1463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rangan Pratik Borah — Engineer & Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/framer-motion@6.5.1/dist/framer-motion.js"></script>
+<style>
+  html, body, #root { background: #0C0C0C; }
+  body { background: transparent; }
+  #root { background: transparent; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 0; font-family: 'Kanit', sans-serif; color: #D7E2EA; overflow-x: clip; }
+  /* Fixed video background (HLS) */
+  .bg-frames, .bg-video-tint {
+    position: fixed; inset: 0;
+    width: 100vw; height: 100vh;
+    z-index: -2;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .bg-frames {
+    will-change: transform;
+    transform: scale(1.06);
+    filter: saturate(1.20) brightness(1.05) contrast(1.05);
+  }
+  .bg-video-el {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .bg-video-tint {
+    z-index: -1;
+    background:
+      radial-gradient(95% 80% at 50% 30%, rgba(12,12,12,0) 0%, rgba(12,12,12,0.10) 60%, rgba(12,12,12,0.28) 100%);
+  }
+  /* Splash while video loads */
+  .bg-splash {
+    position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    background: linear-gradient(180deg, #061a2b 0%, #04101d 60%, #020812 100%);
+  }
+  /* Make dark sections transparent so the video shows through */
+  .has-video-bg { background: transparent !important; }
+  /* Subtle backdrop blur for readability inside cards */
+  .video-overlay { background: rgba(12, 12, 12, 0.35); backdrop-filter: blur(2px); }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .hero-heading {
+    background: linear-gradient(180deg, #5a6068 0%, #BBCCD7 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .accent-heading {
+    background: linear-gradient(180deg, #E4A86B 0%, #F4D8B3 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  /* Original CTA — minimal, structural, not the referenced gradient pill */
+  .cta-pill {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #F4EDDC;
+    color: #0C0C0C;
+    border-radius: 999px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    transition: transform .2s ease, background .2s ease;
+  }
+  .cta-pill:hover { transform: translateY(-1px); background: #fff; }
+  .cta-pill .dot {
+    width: 0.5rem; height: 0.5rem; border-radius: 999px;
+    background: #0C0C0C;
+  }
+  .ghost-pill {
+    display: inline-flex; align-items: center; gap: 0.65rem;
+    border: 1.5px solid #D7E2EA;
+    color: #D7E2EA;
+    border-radius: 999px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    transition: background .2s ease, color .2s ease;
+  }
+  .ghost-pill:hover { background: rgba(215,226,234,0.10); }
+  .marquee-card {
+    width: 320px; height: 210px;
+    border-radius: 18px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #15161a;
+    border: 1px solid rgba(215,226,234,0.06);
+    position: relative;
+  }
+  @media (min-width: 768px) {
+    .marquee-card { width: 380px; height: 240px; border-radius: 22px; }
+  }
+  .marquee-card .stripe {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, rgba(215,226,234,0.04) 0 14px, transparent 14px 28px);
+  }
+  .marquee-card .label {
+    position: absolute; left: 16px; bottom: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: rgba(215,226,234,0.55);
+    letter-spacing: 0.08em;
+  }
+  .marquee-card .tag {
+    position: absolute; right: 16px; top: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: rgba(215,226,234,0.4);
+    letter-spacing: 0.1em;
+  }
+  .grain::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 3px 3px;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+  .proj-img {
+    position: relative;
+    background: linear-gradient(140deg, #1a1c20 0%, #0f1013 100%);
+    overflow: hidden;
+  }
+  .proj-img .pattern {
+    position: absolute; inset: 0;
+    opacity: 0.5;
+  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  ::selection { background: #E4A86B; color: #0C0C0C; }
+</style>
+</head>
+<body>
+<div class="bg-splash"></div>
+<div id="bg-frames" class="bg-frames">
+  <video id="bg-hls" class="bg-video-el" muted autoplay loop playsinline preload="auto" crossorigin="anonymous"></video>
+</div>
+<div class="bg-video-tint"></div>
+<div id="root"></div>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js"></script>
+<script>
+(function () {
+  const SRC = "https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g.m3u8";
+  const video = document.getElementById("bg-hls");
+  const container = document.getElementById("bg-frames");
+  if (!video || !container) return;
+
+  // Wire up HLS playback
+  const supportsNative = video.canPlayType("application/vnd.apple.mpegurl") !== "";
+  if (supportsNative) {
+    video.src = SRC;
+  } else if (window.Hls && Hls.isSupported()) {
+    const hls = new Hls({ lowLatencyMode: false });
+    hls.loadSource(SRC);
+    hls.attachMedia(video);
+  } else {
+    // last-ditch fallback
+    video.src = SRC;
+  }
+
+  const tryPlay = () => { const p = video.play(); if (p && p.catch) p.catch(() => {}); };
+  video.addEventListener("loadeddata", tryPlay, { once: true });
+  video.addEventListener("canplay", tryPlay, { once: true });
+  tryPlay();
+
+  // Subtle parallax on scroll
+  let parallax = 0, targetParallax = 0, rafId = null;
+  const compute = () => {
+    targetParallax = -window.scrollY * 0.07;
+    if (!rafId) rafId = requestAnimationFrame(tick);
+  };
+  const tick = () => {
+    rafId = null;
+    parallax += (targetParallax - parallax) * 0.22;
+    container.style.transform = `translate3d(0, ${parallax.toFixed(2)}px, 0) scale(1.06)`;
+    if (Math.abs(targetParallax - parallax) > 0.1) rafId = requestAnimationFrame(tick);
+  };
+  window.addEventListener("scroll", compute, { passive: true });
+  window.addEventListener("resize", compute);
+  compute();
+})();
+</script>
+
+<script type="text/babel" data-presets="env,react">
+const FM = window.Motion || window.framerMotion || window.FramerMotion;
+const M = FM.motion;
+const useScrollFM = FM.useScroll;
+const useTransformFM = FM.useTransform;
+
+const { useRef, useEffect, useState, useMemo } = React;
+
+/* ============= FADE IN ============= */
+function FadeIn({ children, delay=0, duration=0.7, y=30, x=0, as="div", className="", ...rest }) {
+  const MotionTag = M[as] || M.div;
+  return (
+    <MotionTag
+      className={className}
+      initial={{ opacity: 0, y, x }}
+      whileInView={{ opacity: 1, y: 0, x: 0 }}
+      viewport={{ once: true, margin: "50px", amount: 0 }}
+      transition={{ duration, delay, ease: [0.25, 0.1, 0.25, 1] }}
+      {...rest}
+    >
+      {children}
+    </MotionTag>
+  );
+}
+
+/* ============= MAGNET ============= */
+function Magnet({ children, padding=140, strength=3, className="", style={} }) {
+  const ref = useRef(null);
+  const [active, setActive] = useState(false);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    const onMove = (e) => {
+      const el = ref.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const dx = e.clientX - cx;
+      const dy = e.clientY - cy;
+      const within = Math.abs(dx) < r.width/2 + padding && Math.abs(dy) < r.height/2 + padding;
+      if (within) {
+        setActive(true);
+        setPos({ x: dx / strength, y: dy / strength });
+      } else {
+        setActive(false);
+        setPos({ x: 0, y: 0 });
+      }
+    };
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [padding, strength]);
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        ...style,
+        transform: `translate3d(${pos.x}px, ${pos.y}px, 0)`,
+        transition: active ? "transform 0.3s ease-out" : "transform 0.6s ease-in-out",
+        willChange: "transform",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ============= ANIMATED CHAR TEXT ============= */
+function AnimatedText({ text, className="", style={} }) {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScrollFM({
+    target: ref,
+    offset: ["start 0.85", "end 0.3"],
+  });
+  const chars = useMemo(() => Array.from(text), [text]);
+  return (
+    <p ref={ref} className={className} style={{ position: "relative", ...style }}>
+      {chars.map((ch, i) => (
+        <Char key={i} index={i} total={chars.length} progress={scrollYProgress} ch={ch} />
+      ))}
+    </p>
+  );
+}
+function Char({ ch, index, total, progress }) {
+  const start = index / total;
+  const end = start + 1 / total;
+  const opacity = useTransformFM(progress, [start, end], [0.18, 1]);
+  return (
+    <span style={{ position: "relative", display: "inline" }}>
+      <span style={{ opacity: 0.18 }}>{ch}</span>
+      <M.span
+        aria-hidden
+        style={{
+          position: "absolute",
+          left: 0, top: 0,
+          opacity,
+          color: "#F4EDDC",
+        }}
+      >
+        {ch}
+      </M.span>
+    </span>
+  );
+}
+
+/* ============= CONTACT BUTTON ============= */
+function ContactButton({ children="Contact me", href="#contact", className="" }) {
+  return (
+    <a href={href}
+       className={`cta-pill px-7 py-3 sm:px-9 sm:py-3.5 md:px-10 md:py-4 text-xs sm:text-sm md:text-base ${className}`}>
+      <span className="dot"></span>
+      <span>{children}</span>
+    </a>
+  );
+}
+
+function LiveProjectButton({ children="View project", href="#" }) {
+  return (
+    <a href={href}
+       className="ghost-pill px-6 py-2.5 sm:px-8 sm:py-3 text-xs sm:text-sm whitespace-nowrap">
+      <span>{children}</span>
+      <span aria-hidden>↗</span>
+    </a>
+  );
+}
+
+function SmallLink({ children, href="#", icon }) {
+  return (
+    <a href={href} target="_blank" rel="noreferrer"
+       className="inline-flex items-center gap-2 border border-[#D7E2EA]/30 hover:border-[#F4EDDC] hover:text-[#F4EDDC] text-[#D7E2EA] text-[11px] sm:text-xs uppercase tracking-[0.18em] font-medium rounded-full px-4 py-2 sm:px-5 sm:py-2.5 transition-colors duration-200">
+      {icon}
+      <span>{children}</span>
+      <span aria-hidden className="opacity-60">↗</span>
+    </a>
+  );
+}
+
+const IconGithub = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.11.79-.25.79-.56 0-.27-.01-1-.02-1.96-3.2.69-3.88-1.54-3.88-1.54-.52-1.34-1.28-1.7-1.28-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.3-.52-1.48.11-3.08 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.21-1.49 3.18-1.18 3.18-1.18.63 1.6.23 2.78.11 3.08.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.41-5.27 5.69.41.36.78 1.06.78 2.14 0 1.55-.02 2.79-.02 3.17 0 .31.21.68.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/>
+  </svg>
+);
+const IconPlay = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M8 5v14l11-7z"/>
+  </svg>
+);
+
+/* ============= NAV ============= */
+function NavLink({ label }) {
+  return (
+    <a href={`#${label.toLowerCase()}`}
+       className="text-[#D7E2EA] font-medium uppercase tracking-wider text-sm md:text-base lg:text-[1.05rem] hover:opacity-70 transition-opacity duration-200">
+      {label}
+    </a>
+  );
+}
+function Navbar() {
+  return (
+    <FadeIn y={-20} delay={0} duration={0.7}>
+      <nav className="flex justify-between items-center px-6 md:px-10 pt-6 md:pt-8">
+        <a href="#" className="mono text-xs sm:text-sm uppercase tracking-[0.2em] text-[#D7E2EA]/70">
+          RPB · 2025
+        </a>
+        <div className="flex gap-6 sm:gap-9 md:gap-12">
+          <NavLink label="About"/>
+          <NavLink label="Skills"/>
+          <NavLink label="Projects"/>
+          <NavLink label="Contact"/>
+        </div>
+        <a href="mailto:ranganpratikborah2006@gmail.com"
+           className="mono hidden sm:inline-block text-xs uppercase tracking-[0.2em] text-[#D7E2EA]/70 hover:opacity-100">
+          available · jan 2026
+        </a>
+      </nav>
+    </FadeIn>
+  );
+}
+
+/* ============= PORTRAIT CAROUSEL ============= */
+function PortraitCarousel() {
+  const photos = [
+    { src: "assets/portrait.jpg",        pos: "50% 28%" },
+    { src: "assets/hero_drone.jpeg",       pos: "50% 40%" },
+    { src: "assets/hero_medals.jpeg",      pos: "50% 30%" },
+    { src: "assets/hero_esp32bot.jpeg",    pos: "50% 50%" },
+    { src: "assets/hero_makeathon.jpeg",   pos: "50% 50%" },
+  ];
+  const [idx, setIdx] = useState(0);
+  const prev = () => setIdx(i => (i - 1 + photos.length) % photos.length);
+  const next = () => setIdx(i => (i + 1) % photos.length);
+
+  return (
+    <div className="relative w-full aspect-[3/4] rounded-[28px] overflow-hidden border border-[#D7E2EA]/15"
+         style={{ background: "linear-gradient(160deg, #1f1411 0%, #0C0C0C 60%, #15161a 100%)" }}>
+
+      {/* Photos — crossfade via opacity */}
+      {photos.map((p, i) => (
+        <img key={i} src={p.src} alt="Rangan Pratik Borah"
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+          style={{ objectPosition: p.pos, opacity: i === idx ? 1 : 0 }} />
+      ))}
+
+      {/* Tonal overlay */}
+      <div className="absolute inset-0 pointer-events-none"
+           style={{ background: "linear-gradient(180deg, rgba(12,12,12,0.05) 0%, rgba(12,12,12,0.35) 100%)" }}/>
+
+      {/* Corner labels */}
+      <div className="absolute left-3 top-3 mono text-[10px] tracking-[0.2em] uppercase text-[#F4EDDC]/85">rpb</div>
+      <div className="absolute right-3 top-3 mono text-[10px] tracking-[0.2em] uppercase text-[#F4EDDC]/60">
+        {String(idx + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
+      </div>
+      <div className="absolute left-3 bottom-3 mono text-[10px] tracking-[0.2em] uppercase text-[#F4EDDC]/70">vit · vellore · 2025</div>
+      <div className="absolute right-3 bottom-3 flex items-center gap-1.5">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#E4A86B] animate-pulse"/>
+        <span className="mono text-[10px] tracking-[0.2em] uppercase text-[#F4EDDC]/70">on</span>
+      </div>
+
+      {/* Nav arrows */}
+      <button onClick={prev}
+        className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
+        style={{ background: "rgba(12,12,12,0.55)", border: "1px solid rgba(212,226,234,0.25)", backdropFilter: "blur(6px)" }}>
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#F4EDDC" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <button onClick={next}
+        className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
+        style={{ background: "rgba(12,12,12,0.55)", border: "1px solid rgba(212,226,234,0.25)", backdropFilter: "blur(6px)" }}>
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#F4EDDC" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+
+      {/* Dot indicators */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+        {photos.map((_, i) => (
+          <button key={i} onClick={() => setIdx(i)}
+            className="rounded-full transition-all duration-300"
+            style={{ width: i === idx ? "16px" : "6px", height: "6px",
+                     background: i === idx ? "#F4EDDC" : "rgba(244,237,220,0.35)" }}/>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ============= HERO ============= */
+function HeroSection() {
+  return (
+    <section id="top" className="h-screen flex flex-col overflow-x-clip relative has-video-bg">
+      <Navbar />
+      <div className="flex-1 flex flex-col justify-between relative">
+        <div className="mt-6 sm:mt-4 md:-mt-2 px-2" style={{ overflowY: "clip" }}>
+          <FadeIn delay={0.15} y={40} duration={0.85}>
+            <h1 className="hero-heading font-black uppercase tracking-tight leading-none whitespace-nowrap w-full text-center"
+                style={{ fontSize: "clamp(2.5rem, 13.5vw, 13.5vw)" }}>
+              hi, i&apos;m rangan
+            </h1>
+          </FadeIn>
+        </div>
+
+        {/* Portrait */}
+        <div className="absolute left-1/2 -translate-x-1/2 z-10
+                        w-[200px] sm:w-[260px] md:w-[320px] lg:w-[380px]
+                        top-[55%] sm:top-auto sm:bottom-0 -translate-y-1/2 sm:translate-y-0">
+          <FadeIn delay={0.6} y={30} duration={0.9}>
+            <Magnet padding={150} strength={4}>
+              <PortraitCarousel />
+            </Magnet>
+          </FadeIn>
+        </div>
+
+        <div className="flex justify-between items-end px-6 md:px-10 pb-7 sm:pb-8 md:pb-10 relative z-20">
+          <FadeIn delay={0.35} y={20}>
+            <p className="text-[#D7E2EA] font-light uppercase tracking-wide leading-snug max-w-[160px] sm:max-w-[220px] md:max-w-[270px]"
+               style={{ fontSize: "clamp(0.75rem, 1.4vw, 1.5rem)" }}>
+              an engineering student building things at the edge of ai, embedded systems and the web.
+            </p>
+          </FadeIn>
+          <FadeIn delay={0.5} y={20}>
+            <ContactButton>let&apos;s talk</ContactButton>
+          </FadeIn>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============= MARQUEE — original tech stack cards, not external GIFs ============= */
+const STACK_TILES = [
+  { label: "OpenCV", tag: "vision/01", hue: 25, kind: "face" },
+  { label: "Haar Cascade", tag: "algorithm/01", hue: 30, kind: "face" },
+  { label: "LBPH", tag: "algorithm/02", hue: 18, kind: "code", snippet: ["recognizer = cv2.face.", "  LBPHFaceRecognizer_create()", "label, conf = recognizer.predict(roi)"] },
+  { label: "MediaPipe", tag: "vision/02", hue: 200, kind: "face" },
+  { label: "Python", tag: "lang/01", hue: 210, kind: "code", snippet: ["def detect(frame):", "  gray = cv2.cvtColor(frame, GRAY)", "  return cascade.detectMultiScale(gray)"] },
+  { label: "Java", tag: "lang/02", hue: 12, kind: "code", snippet: ["@RestController", "public class UserController {", "  @PostMapping(\"/register\") …"] },
+  { label: "Spring Boot", tag: "stack/01", hue: 130, kind: "code", snippet: ["@SpringBootApplication", "public class App {", "  SpringApplication.run(App.class);"] },
+  { label: "React + Tailwind", tag: "web/01", hue: 195, kind: "code", snippet: ["export default function Hero(){", "  return <section className=", "    \"flex items-center\">…"] },
+  { label: "Vercel", tag: "deploy/01", hue: 0, kind: "web", mono: true },
+  { label: "Spotify API", tag: "web/02", hue: 140, kind: "wave" },
+  { label: "ngrok", tag: "deploy/02", hue: 220, kind: "tunnel" },
+  { label: "ESP32", tag: "mcu/01", hue: 0, kind: "chip" },
+  { label: "Arduino", tag: "mcu/02", hue: 175, kind: "board" },
+  { label: "Raspberry Pi", tag: "mcu/03", hue: 350, kind: "board" },
+  { label: "Sensor I/O", tag: "iot/01", hue: 45, kind: "wave" },
+  { label: "MySQL", tag: "data/01", hue: 30, kind: "db" },
+  { label: "SQLite", tag: "data/02", hue: 210, kind: "db" },
+  { label: "Intel Quartus Prime", tag: "logic/01", hue: 215, kind: "gates" },
+  { label: "VS Code", tag: "tools/01", hue: 210, kind: "code", snippet: [".vscode/", "  settings.json", "  launch.json"] },
+  { label: "GitHub", tag: "tools/02", hue: 0, kind: "branch", mono: true },
+  { label: "128-D Vectors", tag: "ml/01", hue: 280, kind: "matrix" },
+];
+
+function TileVisual({ tile }) {
+  const { hue, mono, kind, snippet, label } = tile;
+  const accent = mono ? "rgba(215,226,234,0.85)" : `oklch(0.78 0.13 ${hue})`;
+  const accentSoft = mono ? "rgba(215,226,234,0.35)" : `oklch(0.78 0.13 ${hue} / 0.45)`;
+  const bgGrad = mono ? "rgba(215,226,234,0.10)" : `oklch(0.55 0.10 ${hue} / 0.18)`;
+  const dim = "rgba(215,226,234,0.18)";
+  return (
+    <div className="absolute inset-0">
+      <div className="stripe"></div>
+      <svg viewBox="0 0 380 240" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <radialGradient id={`tg-${hue}-${kind}-${mono?1:0}`} cx="20%" cy="15%" r="100%">
+            <stop offset="0%" stopColor={bgGrad}/>
+            <stop offset="100%" stopColor="transparent"/>
+          </radialGradient>
+        </defs>
+        <rect width="380" height="240" fill={`url(#tg-${hue}-${kind}-${mono?1:0})`}/>
+        <TileGraphic kind={kind} accent={accent} accentSoft={accentSoft} dim={dim} snippet={snippet} label={label}/>
+      </svg>
+    </div>
+  );
+}
+
+function TileGraphic({ kind, accent, accentSoft, dim, snippet, label }) {
+  if (kind === "code") {
+    return (
+      <g>
+        {/* editor window */}
+        <rect x="36" y="40" width="308" height="160" rx="10" fill="rgba(0,0,0,0.45)" stroke={dim} strokeWidth="1"/>
+        <rect x="36" y="40" width="308" height="22" rx="10" fill="rgba(255,255,255,0.04)"/>
+        <circle cx="50" cy="51" r="3" fill="#ff5f57"/>
+        <circle cx="62" cy="51" r="3" fill="#febc2e"/>
+        <circle cx="74" cy="51" r="3" fill="#28c840"/>
+        <text x="180" y="55" fontFamily="JetBrains Mono, monospace" fontSize="9" fill={dim} textAnchor="middle">{label?.toLowerCase().replace(/\s+/g,'-')+'.snippet'}</text>
+        {/* line numbers */}
+        {[0,1,2,3,4].map(i => (
+          <text key={i} x="48" y={88 + i*22} fontFamily="JetBrains Mono, monospace" fontSize="10" fill="rgba(215,226,234,0.25)">{i+1}</text>
+        ))}
+        {/* code lines */}
+        {snippet && snippet.map((line, i) => (
+          <text key={i} x="68" y={88 + i*22} fontFamily="JetBrains Mono, monospace" fontSize="10.5" fill={accent} fontWeight="500">{line}</text>
+        ))}
+        {/* cursor */}
+        <rect x="68" y={88 + (snippet?snippet.length:3)*22 - 9} width="6" height="11" fill={accent} opacity="0.9"/>
+      </g>
+    );
+  }
+  if (kind === "face") {
+    return (
+      <g>
+        {/* face detection frame */}
+        <rect x="120" y="50" width="140" height="160" rx="8" fill="none" stroke={accent} strokeWidth="1.5" strokeDasharray="4 4"/>
+        <text x="124" y="46" fontFamily="JetBrains Mono, monospace" fontSize="9" fill={accent}>0.94 · face</text>
+        {/* head silhouette */}
+        <ellipse cx="190" cy="120" rx="42" ry="50" fill="none" stroke={accentSoft} strokeWidth="1.5"/>
+        <ellipse cx="190" cy="125" rx="36" ry="44" fill={accentSoft} opacity="0.18"/>
+        {/* eyes */}
+        <circle cx="176" cy="115" r="3" fill={accent}/>
+        <circle cx="204" cy="115" r="3" fill={accent}/>
+        {/* landmark dots */}
+        {[[170,140],[210,140],[190,150],[178,160],[202,160],[190,165]].map(([cx,cy],i)=>(
+          <circle key={i} cx={cx} cy={cy} r="1.5" fill={accent}/>
+        ))}
+        {/* corner brackets */}
+        <path d={`M 120 60 L 120 50 L 130 50`} stroke={accent} strokeWidth="2" fill="none"/>
+        <path d={`M 250 50 L 260 50 L 260 60`} stroke={accent} strokeWidth="2" fill="none"/>
+        <path d={`M 260 200 L 260 210 L 250 210`} stroke={accent} strokeWidth="2" fill="none"/>
+        <path d={`M 130 210 L 120 210 L 120 200`} stroke={accent} strokeWidth="2" fill="none"/>
+        {/* scan line */}
+        <line x1="120" y1="130" x2="260" y2="130" stroke={accent} strokeWidth="0.5" opacity="0.4"/>
+      </g>
+    );
+  }
+  if (kind === "chip") {
+    return (
+      <g>
+        {/* chip body */}
+        <rect x="120" y="70" width="140" height="100" rx="6" fill="rgba(0,0,0,0.5)" stroke={accent} strokeWidth="1.5"/>
+        <rect x="135" y="85" width="110" height="70" rx="2" fill="none" stroke={accentSoft} strokeWidth="1"/>
+        <text x="190" y="125" fontFamily="JetBrains Mono, monospace" fontSize="14" fontWeight="700" fill={accent} textAnchor="middle">ESP32</text>
+        <text x="190" y="142" fontFamily="JetBrains Mono, monospace" fontSize="7" fill={dim} textAnchor="middle">240 MHz · Wi-Fi · BLE</text>
+        {/* pins top */}
+        {[0,1,2,3,4,5,6,7,8,9].map(i=>(
+          <rect key={`pt-${i}`} x={130+i*12} y="60" width="6" height="10" fill={accentSoft}/>
+        ))}
+        {/* pins bottom */}
+        {[0,1,2,3,4,5,6,7,8,9].map(i=>(
+          <rect key={`pb-${i}`} x={130+i*12} y="170" width="6" height="10" fill={accentSoft}/>
+        ))}
+        {/* traces */}
+        <line x1="80" y1="120" x2="120" y2="120" stroke={accent} strokeWidth="0.8"/>
+        <line x1="260" y1="120" x2="300" y2="120" stroke={accent} strokeWidth="0.8"/>
+        <circle cx="80" cy="120" r="3" fill={accent}/>
+        <circle cx="300" cy="120" r="3" fill={accent}/>
+      </g>
+    );
+  }
+  if (kind === "board") {
+    return (
+      <g>
+        {/* board */}
+        <rect x="60" y="55" width="260" height="130" rx="6" fill="rgba(0,0,0,0.45)" stroke={accent} strokeWidth="1.2"/>
+        {/* mounting holes */}
+        {[[75,70],[305,70],[75,170],[305,170]].map(([cx,cy],i)=>(
+          <circle key={i} cx={cx} cy={cy} r="4" fill="none" stroke={accentSoft} strokeWidth="1"/>
+        ))}
+        {/* microcontroller */}
+        <rect x="100" y="95" width="60" height="60" rx="3" fill="rgba(0,0,0,0.6)" stroke={accent} strokeWidth="1"/>
+        <text x="130" y="130" fontFamily="JetBrains Mono, monospace" fontSize="10" fontWeight="700" fill={accent} textAnchor="middle">{label}</text>
+        {/* connectors */}
+        <rect x="200" y="75" width="80" height="14" rx="2" fill="none" stroke={accentSoft} strokeWidth="1"/>
+        <rect x="200" y="155" width="80" height="14" rx="2" fill="none" stroke={accentSoft} strokeWidth="1"/>
+        {/* traces */}
+        <path d="M 160 110 L 200 110 L 200 82" stroke={accent} strokeWidth="0.8" fill="none"/>
+        <path d="M 160 140 L 200 140 L 200 162" stroke={accent} strokeWidth="0.8" fill="none"/>
+        <path d="M 160 125 L 220 125" stroke={accentSoft} strokeWidth="0.8" fill="none"/>
+        {/* components */}
+        <circle cx="240" cy="125" r="7" fill="none" stroke={accentSoft} strokeWidth="1"/>
+        <rect x="265" y="115" width="20" height="8" fill={accentSoft} opacity="0.5"/>
+        <rect x="265" y="128" width="20" height="6" fill={accentSoft} opacity="0.3"/>
+      </g>
+    );
+  }
+  if (kind === "db") {
+    return (
+      <g>
+        {/* cylinders */}
+        {[0,1,2].map(i=>(
+          <g key={i} transform={`translate(0 ${i*18})`}>
+            <ellipse cx="190" cy={70} rx="60" ry="10" fill="rgba(0,0,0,0.6)" stroke={accent} strokeWidth="1"/>
+            <path d={`M 130 70 L 130 90 A 60 10 0 0 0 250 90 L 250 70`} fill={i===0?`${accent}`:"rgba(0,0,0,0.55)"} opacity={i===0?0.18:0.9} stroke={accent} strokeWidth="1"/>
+          </g>
+        ))}
+        <text x="190" y="208" fontFamily="JetBrains Mono, monospace" fontSize="10" fontWeight="600" fill={accent} textAnchor="middle">SELECT * FROM users;</text>
+      </g>
+    );
+  }
+  if (kind === "gates") {
+    return (
+      <g stroke={accent} strokeWidth="1.4" fill="none">
+        {/* AND gate */}
+        <path d="M 80 80 L 110 80 A 25 25 0 0 1 110 130 L 80 130 Z"/>
+        <line x1="60" y1="92" x2="80" y2="92"/>
+        <line x1="60" y1="118" x2="80" y2="118"/>
+        <line x1="135" y1="105" x2="180" y2="105"/>
+        {/* XOR gate */}
+        <path d="M 180 80 Q 200 105 180 130 L 195 130 Q 220 130 235 105 Q 220 80 195 80 Z"/>
+        <path d="M 174 80 Q 192 105 174 130"/>
+        <line x1="160" y1="92" x2="180" y2="92"/>
+        <line x1="160" y1="118" x2="180" y2="118"/>
+        <line x1="235" y1="105" x2="280" y2="105"/>
+        <text x="190" y="195" fontFamily="JetBrains Mono, monospace" fontSize="10" fill={accent} textAnchor="middle">A ⊕ B → SUM · A·B → CARRY</text>
+      </g>
+    );
+  }
+  if (kind === "wave") {
+    return (
+      <g>
+        <path d="M 40 130 Q 70 80 100 130 T 160 130 T 220 130 T 280 130 T 340 130" fill="none" stroke={accent} strokeWidth="1.5"/>
+        <path d="M 40 130 Q 70 100 100 130 T 160 130 T 220 130 T 280 130 T 340 130" fill="none" stroke={accentSoft} strokeWidth="1"/>
+        <line x1="40" y1="130" x2="340" y2="130" stroke={dim} strokeWidth="0.5" strokeDasharray="2 4"/>
+        {[60,120,180,240,300].map((x,i)=>(
+          <circle key={i} cx={x} cy="130" r="2" fill={accent}/>
+        ))}
+        <text x="40" y="50" fontFamily="JetBrains Mono, monospace" fontSize="10" fill={accent} fontWeight="600">{label.toUpperCase()}</text>
+        <text x="40" y="64" fontFamily="JetBrains Mono, monospace" fontSize="8" fill={dim}>analog in · 12-bit ADC</text>
+      </g>
+    );
+  }
+  if (kind === "web") {
+    return (
+      <g>
+        <rect x="60" y="50" width="260" height="140" rx="8" fill="rgba(0,0,0,0.45)" stroke={accent} strokeWidth="1.2"/>
+        <rect x="60" y="50" width="260" height="22" rx="8" fill="rgba(255,255,255,0.04)"/>
+        <circle cx="75" cy="61" r="3" fill={accentSoft}/>
+        <circle cx="87" cy="61" r="3" fill={accentSoft}/>
+        <circle cx="99" cy="61" r="3" fill={accentSoft}/>
+        <rect x="115" y="55" width="160" height="12" rx="3" fill="rgba(255,255,255,0.04)"/>
+        <text x="120" y="65" fontFamily="JetBrains Mono, monospace" fontSize="8" fill={dim}>https://{label.toLowerCase()}.app</text>
+        <text x="190" y="130" fontFamily="JetBrains Mono, monospace" fontSize="22" fontWeight="700" fill={accent} textAnchor="middle">▲ {label}</text>
+        <text x="190" y="155" fontFamily="JetBrains Mono, monospace" fontSize="8" fill={dim} textAnchor="middle">deployed · ready</text>
+      </g>
+    );
+  }
+  if (kind === "tunnel") {
+    return (
+      <g>
+        <circle cx="100" cy="120" r="18" fill="none" stroke={accent} strokeWidth="1.4"/>
+        <text x="100" y="124" fontFamily="JetBrains Mono, monospace" fontSize="8" fill={accent} textAnchor="middle">local</text>
+        <circle cx="280" cy="120" r="18" fill="none" stroke={accent} strokeWidth="1.4"/>
+        <text x="280" y="124" fontFamily="JetBrains Mono, monospace" fontSize="8" fill={accent} textAnchor="middle">www</text>
+        <path d="M 118 120 C 160 60, 220 180, 262 120" fill="none" stroke={accent} strokeWidth="1.2" strokeDasharray="4 4"/>
+        <text x="190" y="180" fontFamily="JetBrains Mono, monospace" fontSize="9" fill={dim} textAnchor="middle">:3000 → public url</text>
+      </g>
+    );
+  }
+  if (kind === "branch") {
+    return (
+      <g stroke={accent} strokeWidth="1.5" fill="none">
+        <line x1="80" y1="50" x2="80" y2="200"/>
+        <circle cx="80" cy="70" r="6" fill={accent}/>
+        <circle cx="80" cy="110" r="6" fill={accent}/>
+        <circle cx="80" cy="150" r="6" fill="rgba(0,0,0,0.6)"/>
+        <circle cx="80" cy="190" r="6" fill={accent}/>
+        <path d="M 80 110 Q 130 110 130 150 L 130 180"/>
+        <circle cx="130" cy="150" r="5" fill="rgba(0,0,0,0.6)"/>
+        <circle cx="130" cy="180" r="5" fill={accent}/>
+        <text x="160" y="74" fontFamily="JetBrains Mono, monospace" fontSize="10" fill={accent}>main · init repo</text>
+        <text x="160" y="114" fontFamily="JetBrains Mono, monospace" fontSize="10" fill={accent}>feat: face-rec</text>
+        <text x="160" y="154" fontFamily="JetBrains Mono, monospace" fontSize="10" fill={dim}>branch: ui/cards</text>
+        <text x="160" y="194" fontFamily="JetBrains Mono, monospace" fontSize="10" fill={accent}>merge → main</text>
+      </g>
+    );
+  }
+  if (kind === "matrix") {
+    return (
+      <g>
+        <text x="190" y="55" fontFamily="JetBrains Mono, monospace" fontSize="10" fill={accent} textAnchor="middle" fontWeight="600">embedding[128]</text>
+        {/* matrix dots */}
+        {Array.from({length: 8}).map((_,r)=>(
+          Array.from({length: 16}).map((_,c)=>{
+            const v = Math.sin(r*1.7 + c*0.9) * 0.5 + 0.5;
+            return <rect key={`${r}-${c}`} x={70 + c*16} y={75 + r*16} width="12" height="12" rx="2" fill={accent} opacity={0.15 + v*0.7}/>;
+          })
+        ))}
+        <text x="70" y="218" fontFamily="JetBrains Mono, monospace" fontSize="8" fill={dim}>cosine(a, b) → 0.962</text>
+      </g>
+    );
+  }
+  return null;
+}
+
+function MarqueeSection() {
+  const sectionRef = useRef(null);
+  const [offset, setOffset] = useState(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const el = sectionRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const top = r.top + window.scrollY;
+      const o = (window.scrollY - top + window.innerHeight) * 0.3;
+      setOffset(o);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const row1 = STACK_TILES.slice(0, 11);
+  const row2 = STACK_TILES.slice(11);
+  const triple = (arr) => [...arr, ...arr, ...arr];
+
+  return (
+    <section ref={sectionRef} className="pt-24 sm:pt-32 md:pt-40 pb-10 overflow-hidden relative has-video-bg">
+      <div className="px-6 md:px-10 mb-10 flex justify-between items-end">
+        <FadeIn>
+          <h2 className="font-medium uppercase tracking-[0.04em] text-[#F4EDDC] leading-none"
+              style={{ fontSize: "clamp(1.5rem, 3.6vw, 3.25rem)" }}>
+            Toolkit
+          </h2>
+        </FadeIn>
+        <FadeIn delay={0.1}>
+          <span className="mono text-xs sm:text-sm uppercase tracking-[0.25em] text-[#D7E2EA]/55 hidden sm:inline">
+            scroll to scrub →
+          </span>
+        </FadeIn>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <div className="flex gap-3" style={{ transform: `translateX(${offset - 200}px)`, willChange: "transform" }}>
+          {triple(row1).map((t, i) => (
+            <div key={`r1-${i}`} className="marquee-card grain">
+              <TileVisual tile={t}/>
+              <div className="tag">{t.tag}</div>
+              <div className="label">{t.label}</div>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-3" style={{ transform: `translateX(${-(offset - 200)}px)`, willChange: "transform" }}>
+          {triple(row2).map((t, i) => (
+            <div key={`r2-${i}`} className="marquee-card grain">
+              <TileVisual tile={t}/>
+              <div className="tag">{t.tag}</div>
+              <div className="label">{t.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============= ABOUT ============= */
+function CornerDeco({ pos, delay, x, shape }) {
+  // engineering-themed decorations matching Rangan's domain
+  return (
+    <FadeIn delay={delay} x={x} duration={0.9}
+            className={`absolute ${pos} pointer-events-none`}>
+      <div className="w-[110px] sm:w-[150px] md:w-[200px]"
+           style={{ aspectRatio: "1 / 1" }}>
+        <svg viewBox="0 0 200 200" className="w-full h-full">
+          <defs>
+            <linearGradient id={`gd-${shape}`} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#E4A86B" stopOpacity="0.9"/>
+              <stop offset="100%" stopColor="#D7E2EA" stopOpacity="0.45"/>
+            </linearGradient>
+            <radialGradient id={`gh-${shape}`} cx="50%" cy="50%" r="60%">
+              <stop offset="0%" stopColor="#E4A86B" stopOpacity="0.18"/>
+              <stop offset="100%" stopColor="transparent"/>
+            </radialGradient>
+          </defs>
+          <circle cx="100" cy="100" r="95" fill={`url(#gh-${shape})`}/>
+
+          {shape === "code" && (
+            <g>
+              {/* code editor window */}
+              <rect x="20" y="35" width="160" height="130" rx="10" fill="rgba(12,12,12,0.85)" stroke={`url(#gd-${shape})`} strokeWidth="1.4"/>
+              <rect x="20" y="35" width="160" height="22" rx="10" fill="rgba(228,168,107,0.10)"/>
+              <circle cx="32" cy="46" r="3" fill="#ff5f57"/>
+              <circle cx="44" cy="46" r="3" fill="#febc2e"/>
+              <circle cx="56" cy="46" r="3" fill="#28c840"/>
+              <text x="100" y="50" fontFamily="JetBrains Mono, monospace" fontSize="7" fill="rgba(215,226,234,0.4)" textAnchor="middle">main.py</text>
+              {/* code lines */}
+              <text x="32" y="78" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#E4A86B">def</text>
+              <text x="54" y="78" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#D7E2EA">recognize():</text>
+              <text x="40" y="94" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="rgba(215,226,234,0.7)">faces = haar.</text>
+              <text x="40" y="108" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="rgba(215,226,234,0.7)">  detect(gray)</text>
+              <text x="40" y="124" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#E4A86B">return</text>
+              <text x="74" y="124" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#D7E2EA">faces</text>
+              <text x="32" y="148" fontFamily="JetBrains Mono, monospace" fontSize="7" fill="rgba(215,226,234,0.35)">› 90% acc · 4 days</text>
+              <rect x="32" y="139" width="5" height="9" fill="#E4A86B" opacity="0.9"/>
+            </g>
+          )}
+
+          {shape === "chip" && (
+            <g>
+              {/* MCU board */}
+              <rect x="40" y="50" width="120" height="100" rx="8" fill="rgba(12,12,12,0.85)" stroke={`url(#gd-${shape})`} strokeWidth="1.4"/>
+              {/* pins */}
+              {Array.from({length:8}).map((_,i)=>(
+                <rect key={`pt-${i}`} x={50+i*14} y={42} width="6" height="9" fill="#E4A86B" opacity="0.55"/>
+              ))}
+              {Array.from({length:8}).map((_,i)=>(
+                <rect key={`pb-${i}`} x={50+i*14} y={149} width="6" height="9" fill="#E4A86B" opacity="0.55"/>
+              ))}
+              {/* inner chip */}
+              <rect x="68" y="72" width="64" height="56" rx="3" fill="none" stroke="#D7E2EA" strokeWidth="1" opacity="0.6"/>
+              <text x="100" y="100" fontFamily="JetBrains Mono, monospace" fontSize="11" fontWeight="700" fill="#E4A86B" textAnchor="middle">ESP32</text>
+              <text x="100" y="115" fontFamily="JetBrains Mono, monospace" fontSize="6" fill="rgba(215,226,234,0.6)" textAnchor="middle">240MHz · Wi-Fi</text>
+              {/* traces */}
+              <line x1="20" y1="100" x2="40" y2="100" stroke="#E4A86B" strokeWidth="0.8"/>
+              <line x1="160" y1="100" x2="180" y2="100" stroke="#E4A86B" strokeWidth="0.8"/>
+              <circle cx="20" cy="100" r="3" fill="#E4A86B"/>
+              <circle cx="180" cy="100" r="3" fill="#E4A86B"/>
+              {/* status LED */}
+              <circle cx="150" cy="62" r="3" fill="#E4A86B" className="">
+                <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
+              </circle>
+            </g>
+          )}
+
+          {shape === "face" && (
+            <g>
+              {/* face detection viewfinder */}
+              <rect x="35" y="35" width="130" height="130" rx="6" fill="rgba(12,12,12,0.8)" stroke="rgba(228,168,107,0.4)" strokeWidth="1" strokeDasharray="4 4"/>
+              {/* corner brackets */}
+              <path d="M 35 50 L 35 35 L 50 35" stroke="#E4A86B" strokeWidth="2.2" fill="none"/>
+              <path d="M 150 35 L 165 35 L 165 50" stroke="#E4A86B" strokeWidth="2.2" fill="none"/>
+              <path d="M 165 150 L 165 165 L 150 165" stroke="#E4A86B" strokeWidth="2.2" fill="none"/>
+              <path d="M 50 165 L 35 165 L 35 150" stroke="#E4A86B" strokeWidth="2.2" fill="none"/>
+              {/* face outline */}
+              <ellipse cx="100" cy="100" rx="36" ry="44" fill="rgba(228,168,107,0.08)" stroke="rgba(215,226,234,0.6)" strokeWidth="1.2"/>
+              {/* eyes */}
+              <circle cx="86" cy="95" r="2.5" fill="#E4A86B"/>
+              <circle cx="114" cy="95" r="2.5" fill="#E4A86B"/>
+              <path d="M 92 122 Q 100 128 108 122" stroke="#E4A86B" strokeWidth="1.4" fill="none"/>
+              {/* landmark points */}
+              {[[80,108],[120,108],[100,118],[90,135],[110,135],[100,140]].map(([cx,cy],i)=>(
+                <circle key={i} cx={cx} cy={cy} r="1.4" fill="#D7E2EA" opacity="0.7"/>
+              ))}
+              {/* confidence */}
+              <text x="40" y="180" fontFamily="JetBrains Mono, monospace" fontSize="7" fill="#E4A86B">conf · 0.94</text>
+              <text x="125" y="180" fontFamily="JetBrains Mono, monospace" fontSize="7" fill="#E4A86B">id · 002</text>
+            </g>
+          )}
+
+          {shape === "wave" && (
+            <g>
+              {/* signal / waveform card */}
+              <rect x="20" y="55" width="160" height="90" rx="8" fill="rgba(12,12,12,0.85)" stroke={`url(#gd-${shape})`} strokeWidth="1.4"/>
+              <text x="30" y="72" fontFamily="JetBrains Mono, monospace" fontSize="7" fill="#E4A86B">SENSOR · A0</text>
+              <text x="125" y="72" fontFamily="JetBrains Mono, monospace" fontSize="7" fill="rgba(215,226,234,0.5)">12-bit ADC</text>
+              {/* gridlines */}
+              <line x1="20" y1="100" x2="180" y2="100" stroke="rgba(215,226,234,0.15)" strokeWidth="0.5" strokeDasharray="2 3"/>
+              {/* waveform */}
+              <path d="M 25 125 Q 40 90 55 115 T 85 110 T 115 120 T 145 95 T 175 110"
+                    fill="none" stroke="#E4A86B" strokeWidth="1.6"/>
+              <path d="M 25 130 Q 40 105 55 120 T 85 118 T 115 128 T 145 108 T 175 122"
+                    fill="none" stroke="#D7E2EA" strokeWidth="1" opacity="0.6"/>
+              {/* readouts */}
+              <text x="30" y="160" fontFamily="JetBrains Mono, monospace" fontSize="6" fill="rgba(215,226,234,0.5)">moisture 38%</text>
+              <text x="100" y="160" fontFamily="JetBrains Mono, monospace" fontSize="6" fill="rgba(215,226,234,0.5)">temp 27°C</text>
+              {/* sample dots */}
+              {[55,85,115,145,175].map((x,i)=><circle key={i} cx={x} cy={[115,110,120,95,110][i]} r="1.8" fill="#E4A86B"/>)}
+            </g>
+          )}
+        </svg>
+      </div>
+    </FadeIn>
+  );
+}
+
+function AboutSection() {
+  return (
+    <section id="about" className="min-h-screen flex flex-col items-center justify-center relative px-5 sm:px-8 md:px-10 py-20 overflow-hidden has-video-bg">
+      <CornerDeco pos="top-[6%] left-[2%] sm:left-[4%] md:left-[6%]" delay={0.10} x={-60} shape="code"/>
+      <CornerDeco pos="top-[6%] right-[2%] sm:right-[4%] md:right-[6%]" delay={0.15} x={60} shape="face"/>
+      <CornerDeco pos="bottom-[8%] left-[3%] sm:left-[6%] md:left-[10%]" delay={0.25} x={-60} shape="chip"/>
+      <CornerDeco pos="bottom-[8%] right-[3%] sm:right-[6%] md:right-[10%]" delay={0.30} x={60} shape="wave"/>
+
+      <div className="flex flex-col items-center text-center gap-10 sm:gap-14 md:gap-16 z-10 max-w-3xl">
+        <FadeIn y={40}>
+          <h2 className="hero-heading font-black uppercase leading-none tracking-tight"
+              style={{ fontSize: "clamp(3rem, 12vw, 160px)" }}>
+            About me
+          </h2>
+        </FadeIn>
+
+        <div className="flex flex-col items-center gap-16 sm:gap-20 md:gap-24">
+          <AnimatedText
+            className="font-medium leading-relaxed max-w-[560px] text-center"
+            text="I'm an electronics & communication engineering student at VIT Vellore, building at the seam of AI, embedded systems and the web. I like projects that ship in days, not quarters — and that earn their weight in the real world."
+            style={{ fontSize: "clamp(1rem, 2vw, 1.35rem)" }}
+          />
+          <FadeIn delay={0.2}>
+            <ContactButton>start a project</ContactButton>
+          </FadeIn>
+        </div>
+
+        <FadeIn delay={0.3} className="mt-6">
+          <div className="grid grid-cols-3 gap-6 sm:gap-12 md:gap-20 mono text-[#D7E2EA]/60 text-xs sm:text-sm uppercase tracking-[0.18em] pt-8">
+            <div>
+              <div className="text-[#F4EDDC] text-2xl sm:text-3xl font-medium mb-1">8.6</div>
+              <div>gpa · sem i</div>
+            </div>
+            <div>
+              <div className="text-[#F4EDDC] text-2xl sm:text-3xl font-medium mb-1">90%+</div>
+              <div>face-rec acc.</div>
+            </div>
+            <div>
+              <div className="text-[#F4EDDC] text-2xl sm:text-3xl font-medium mb-1">2×</div>
+              <div>hackathons</div>
+            </div>
+          </div>
+        </FadeIn>
+      </div>
+    </section>
+  );
+}
+
+/* ============= SKILLS / SERVICES ============= */
+const SKILLS = [
+  { n: "01", name: "AI / Machine Vision",
+    desc: "Face detection & recognition pipelines with OpenCV, Haar Cascade and LBPH. MediaPipe-based emotion analysis tied to live application logic." },
+  { n: "02", name: "Embedded & IoT",
+    desc: "Arduino, ESP32 and Raspberry Pi firmware. Sensor integration, control loops and AI-on-the-edge decisioning for automation systems." },
+  { n: "03", name: "Web Development",
+    desc: "React + Tailwind interfaces with real backends — Spring Boot APIs, Spotify API, MySQL — deployed via Vercel and ngrok for live demos." },
+  { n: "04", name: "Digital Logic Design",
+    desc: "Combinational and sequential circuit design in Intel Quartus Prime, grounded in solid electronics fundamentals from coursework." },
+  { n: "05", name: "Design & Visual Craft",
+    desc: "Eight years of fine-arts training feeding into digital art, graphic design and product UI — making engineering work look and feel right." },
+];
+
+function SkillsSection() {
+  return (
+    <section id="skills" className="bg-[#F4EDDC] text-[#0C0C0C] rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] px-5 sm:px-8 md:px-10 py-20 sm:py-24 md:py-32 relative">
+      <FadeIn>
+        <div className="flex justify-between items-end max-w-5xl mx-auto mb-10 sm:mb-14 md:mb-16">
+          <h3 className="font-medium uppercase tracking-[0.04em] text-[#0C0C0C] leading-none"
+              style={{ fontSize: "clamp(1.5rem, 3.6vw, 3.25rem)" }}>
+            What I do
+          </h3>
+          <span className="mono text-xs sm:text-sm uppercase tracking-[0.25em] text-[#0C0C0C]/60 hidden sm:inline">five disciplines</span>
+        </div>
+      </FadeIn>
+      <FadeIn>
+        <h2 className="font-black uppercase text-center leading-none tracking-tight text-[#0C0C0C] mb-16 sm:mb-20 md:mb-28"
+            style={{ fontSize: "clamp(3rem, 12vw, 160px)" }}>
+          Skills
+        </h2>
+      </FadeIn>
+
+      <div className="max-w-5xl mx-auto">
+        {SKILLS.map((s, i) => (
+          <FadeIn key={s.n} delay={i * 0.08} y={28}>
+            <div className="flex items-start sm:items-center gap-4 sm:gap-8 md:gap-12 py-8 sm:py-10 md:py-12"
+                 style={{ borderTop: "1px solid rgba(12,12,12,0.18)", borderBottom: i === SKILLS.length - 1 ? "1px solid rgba(12,12,12,0.18)" : undefined }}>
+              <div className="font-black text-[#0C0C0C] leading-none tracking-tight shrink-0"
+                   style={{ fontSize: "clamp(3rem, 10vw, 140px)" }}>
+                {s.n}
+              </div>
+              <div className="flex-1 flex flex-col gap-3 pt-2">
+                <h3 className="font-medium uppercase tracking-tight text-[#0C0C0C]"
+                    style={{ fontSize: "clamp(1rem, 2.2vw, 2.1rem)" }}>
+                  {s.name}
+                </h3>
+                <p className="font-light leading-relaxed max-w-2xl text-[#0C0C0C]/65"
+                   style={{ fontSize: "clamp(0.85rem, 1.5vw, 1.15rem)" }}>
+                  {s.desc}
+                </p>
+              </div>
+            </div>
+          </FadeIn>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============= PROJECTS ============= */
+const PROJECTS = [
+  {
+    n: "01",
+    category: "AI · Vision · Web",
+    name: "MouFace NEXUS AI",
+    blurb: "Real-time face recognition system with web registration and live detection. Haar Cascade + LBPH, MySQL-backed, ngrok-deployed.",
+    stack: ["Java", "Spring Boot", "OpenCV", "MySQL", "Haar Cascade", "LBPH"],
+    duration: "4 days",
+    accent: 25,
+    github: "https://github.com/RanganBorah/MouFace-NEXUS-AI",
+    demo: "https://irately-curliest-dennis.ngrok-free.dev/",
+    images: {
+      detail: "assets/projects/mouface_detail.mp4",
+      process: "assets/projects/mouface_process.mp4",
+      hero: "assets/projects/mouface_hero.mp4",
+    },
+  },
+  {
+    n: "02",
+    category: "AI · Web · API",
+    name: "Moodora AI",
+    blurb: "Emotion-based music recommendation. MediaPipe reads your face in real time, Spotify API plays the room. React UI, deployed on Vercel.",
+    stack: ["React", "MediaPipe", "Spotify API", "Vercel"],
+    duration: "2 days",
+    accent: 200,
+    github: "https://github.com/RanganBorah/Moodora-AI",
+    demo: "https://moodora-ai.vercel.app/",
+    images: {
+      detail: "assets/projects/moodora_details.jpeg",
+      process: "assets/projects/moodora_process.jpeg",
+      hero: "assets/projects/moodora_hero.mp4",
+    },
+  },
+  {
+    n: "03",
+    category: "Embedded · IoT · AI",
+    name: "Aparupa AI · Smart Irrigation",
+    blurb: "An IoT irrigation system reading live soil & environmental data, using lightweight AI to decide when to water — cutting waste end-to-end.",
+    stack: ["Arduino", "ESP32", "Sensors", "Edge AI"],
+    duration: "2 days",
+    accent: 140,
+    github: "https://github.com/RanganBorah/Aparupa-AI-Based-Smart-Irrigation-System",
+    demo: null,
+    images: {
+      detail: "assets/projects/aparupa_details.jpeg",
+      process: "assets/projects/aparupa_process.mp4",
+      hero: "assets/projects/aparupa_hero.mp4",
+    },
+  },
+  {
+    n: "04",
+    category: "Embedded · Security",
+    name: "Passcode-Based Electronic Security System",
+    blurb: "A passcode-protected security project with real-time input validation and tactile feedback through buzzer and LED indicators.",
+    bullets: [
+      "Built a secure passcode validation flow for access control.",
+      "Integrated buzzer and LED feedback for clear user interaction.",
+      "Demonstrated end-to-end hardware/software integration on MCU.",
+      "Clean, practical control logic with debounce and lockout handling.",
+    ],
+    stack: ["Arduino", "ESP32", "Keypad I/O", "Embedded Logic"],
+    duration: "1 day",
+    accent: 12,
+    github: "https://github.com/RanganBorah/Passcode-based-Electronic-Security-System",
+    demo: null,
+    images: {
+      detail: "assets/projects/passcode_details.jpeg",
+      process: "assets/projects/passcode_process.mp4",
+      hero: "assets/projects/passcode_hero.mp4",
+    },
+  },
+  {
+    n: "05",
+    category: "Digital Logic · HDL",
+    name: "Half Adder Circuit",
+    blurb: "A digital logic design project focused on building and simulating a half adder, the foundational building block of binary addition.",
+    bullets: [
+      "Designed the half adder from XOR and AND primitives.",
+      "Simulated waveforms and timing in Intel Quartus Prime.",
+      "Verified correct SUM and CARRY outputs across all input states.",
+      "Strengthened fundamentals in combinational logic & HDL workflow.",
+    ],
+    stack: ["Intel Quartus Prime", "Verilog", "Logic Design"],
+    duration: "1 day",
+    accent: 215,
+    github: null,
+    demo: null,
+    images: {
+      detail: "assets/projects/halfadder_details.jpeg",
+      process: "assets/projects/halfadder_process.jpeg",
+      hero: "assets/projects/halfadder_hero.jpeg",
+    },
+  },
+];
+
+function ProjectPlaceholderImage({ idx, accent, label }) {
+  // original abstract image card per project
+  const variant = idx % 3;
+  const stroke = `oklch(0.75 0.13 ${accent})`;
+  const patId = `p-${idx}-${accent}`;
+  const renderPattern = () => {
+    if (variant === 0) return (
+      <pattern id={patId} width="22" height="22" patternUnits="userSpaceOnUse">
+        <circle cx="11" cy="11" r="1.4" fill={stroke} opacity="0.55"/>
+      </pattern>
+    );
+    if (variant === 1) return (
+      <pattern id={patId} width="18" height="18" patternUnits="userSpaceOnUse">
+        <line x1="0" y1="0" x2="18" y2="18" stroke={stroke} strokeWidth="0.6" opacity="0.5"/>
+      </pattern>
+    );
+    return (
+      <pattern id={patId} width="24" height="24" patternUnits="userSpaceOnUse">
+        <path d="M 24 0 L 0 0 0 24" fill="none" stroke={stroke} strokeWidth="0.5" opacity="0.45"/>
+      </pattern>
+    );
+  };
+  return (
+    <div className="proj-img w-full h-full">
+      <svg viewBox="0 0 400 300" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          {renderPattern()}
+          <radialGradient id={`pg-${idx}-${accent}`} cx="50%" cy="50%" r="60%">
+            <stop offset="0%" stopColor={`oklch(0.7 0.16 ${accent})`} stopOpacity="0.35"/>
+            <stop offset="100%" stopColor="transparent"/>
+          </radialGradient>
+        </defs>
+        <rect width="400" height="300" fill={`url(#p-${idx}-${accent})`}/>
+        <rect width="400" height="300" fill={`url(#pg-${idx}-${accent})`}/>
+        {idx === 0 && (
+          <g fill="none" stroke={`oklch(0.85 0.1 ${accent})`} strokeWidth="1">
+            <circle cx="200" cy="150" r="90"/>
+            <circle cx="200" cy="150" r="60"/>
+            <circle cx="200" cy="150" r="30"/>
+          </g>
+        )}
+        {idx === 1 && (
+          <g fill="none" stroke={`oklch(0.85 0.1 ${accent})`} strokeWidth="1">
+            <path d="M 50 220 Q 200 80 350 220" />
+            <path d="M 50 240 Q 200 100 350 240" opacity="0.6"/>
+            <path d="M 50 200 Q 200 60 350 200" opacity="0.6"/>
+          </g>
+        )}
+        {idx === 2 && (
+          <g fill="none" stroke={`oklch(0.85 0.1 ${accent})`} strokeWidth="1">
+            <rect x="120" y="80" width="160" height="140" rx="10"/>
+            <line x1="120" y1="120" x2="280" y2="120"/>
+            <line x1="120" y1="160" x2="280" y2="160"/>
+            <line x1="120" y1="200" x2="280" y2="200"/>
+          </g>
+        )}
+      </svg>
+      <span className="absolute left-4 bottom-3 mono text-[10px] tracking-[0.2em] uppercase text-[#D7E2EA]/45">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function RealOrPlaceholder({ src, alt, idx, accent, label, objectPosition="center" }) {
+  if (src) {
+    const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(src);
+    return (
+      <div className="absolute inset-0 w-full h-full bg-[#0f1013]">
+        {isVideo ? (
+          <video
+            src={src}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ objectPosition }}
+          />
+        ) : (
+          <img src={src} alt={alt}
+               loading="lazy"
+               className="absolute inset-0 w-full h-full object-cover"
+               style={{ objectPosition }}/>
+        )}
+        <span className="absolute left-4 bottom-3 mono text-[10px] tracking-[0.2em] uppercase text-[#F4EDDC]/85 bg-black/40 backdrop-blur-sm rounded px-2 py-0.5">
+          {label}
+        </span>
+      </div>
+    );
+  }
+  return <ProjectPlaceholderImage idx={idx} accent={accent} label={label}/>;
+}
+
+function ProjectCard({ project, idx, total }) {
+  const wrapperRef = useRef(null);
+  const { scrollYProgress } = useScrollFM({
+    target: wrapperRef,
+    offset: ["start start", "end start"],
+  });
+  const targetScale = 1 - (total - 1 - idx) * 0.03;
+  const scale = useTransformFM(scrollYProgress, [0, 1], [1, targetScale]);
+  const imgs = project.images || {};
+
+  return (
+    <div ref={wrapperRef} style={{ paddingBottom: "60vh" }}>
+      <M.div
+        style={{ top: `${96 + idx * 28}px`, scale, transformOrigin: "top center", zIndex: idx + 1 }}
+        className="sticky rounded-[36px] sm:rounded-[44px] md:rounded-[56px] border border-[#D7E2EA]/40 bg-[#0C0C0C] p-4 sm:p-6 md:p-8 flex flex-col gap-5 sm:gap-6 md:gap-8 overflow-hidden grain relative">
+
+        {/* Top row: title block + action buttons */}
+        <div className="flex flex-col md:flex-row md:items-start gap-5 md:gap-6">
+          <div className="flex items-center gap-5 md:gap-7 flex-1 min-w-0">
+            <div className="font-black text-[#F4EDDC] leading-none tracking-tight shrink-0"
+                 style={{ fontSize: "clamp(2.4rem, 7vw, 6rem)" }}>
+              {project.n}
+            </div>
+            <div className="flex flex-col gap-1.5 min-w-0">
+              <span className="mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#D7E2EA]/55">
+                {project.category} · {project.duration}
+              </span>
+              <h3 className="font-medium uppercase tracking-tight text-[#F4EDDC] leading-tight"
+                  style={{ fontSize: "clamp(1.1rem, 2.6vw, 2.4rem)" }}>
+                {project.name}
+              </h3>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
+            {project.github && <SmallLink href={project.github} icon={<IconGithub/>}>GitHub</SmallLink>}
+            {project.demo   && <SmallLink href={project.demo}   icon={<IconPlay/>}>Live demo</SmallLink>}
+          </div>
+        </div>
+
+        {/* Image grid + meta */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 sm:gap-4 md:gap-5">
+          {/* Left column — detail + process */}
+          <div className="md:col-span-2 flex flex-col gap-3 sm:gap-4 md:gap-5">
+            <div className="rounded-[22px] sm:rounded-[28px] md:rounded-[34px] overflow-hidden relative"
+                 style={{ aspectRatio: "4 / 3" }}>
+              <RealOrPlaceholder src={imgs.detail} alt={`${project.name} detail`}
+                                  idx={idx} accent={project.accent}
+                                  label={`${project.name} · detail`}/>
+            </div>
+            <div className="rounded-[22px] sm:rounded-[28px] md:rounded-[34px] overflow-hidden relative"
+                 style={{ aspectRatio: "3 / 4" }}>
+              <RealOrPlaceholder src={imgs.process} alt={`${project.name} process`}
+                                  idx={(idx + 1) % 3} accent={project.accent}
+                                  label={`${project.name} · process`}
+                                  objectPosition="50% 0%"/>
+            </div>
+          </div>
+
+          {/* Right column — hero + meta */}
+          <div className="md:col-span-3 flex flex-col gap-3 sm:gap-4 md:gap-5">
+            <div className="rounded-[22px] sm:rounded-[28px] md:rounded-[34px] overflow-hidden relative"
+                 style={{ aspectRatio: "16 / 11" }}>
+              <RealOrPlaceholder src={imgs.hero} alt={`${project.name} hero`}
+                                  idx={(idx + 2) % 3} accent={project.accent}
+                                  label={`${project.name} · hero`}/>
+            </div>
+            <div className="px-1 sm:px-2 pb-1 pt-1 flex flex-col gap-4">
+              <p className="text-[#D7E2EA]/80 font-light leading-relaxed max-w-2xl"
+                 style={{ fontSize: "clamp(0.9rem, 1.4vw, 1.1rem)" }}>
+                {project.blurb}
+              </p>
+              {project.bullets && (
+                <ul className="flex flex-col gap-1.5 max-w-2xl">
+                  {project.bullets.map((b) => (
+                    <li key={b} className="flex gap-3 text-[#D7E2EA]/70 font-light leading-relaxed"
+                        style={{ fontSize: "clamp(0.8rem, 1.2vw, 0.98rem)" }}>
+                      <span className="mono text-[#E4A86B] shrink-0 mt-0.5">›</span>
+                      <span>{b}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="flex flex-wrap gap-2">
+                {project.stack.map((s) => (
+                  <span key={s} className="mono text-[10px] sm:text-[11px] uppercase tracking-[0.15em] text-[#D7E2EA]/60 border border-[#D7E2EA]/20 rounded-full px-3 py-1">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </M.div>
+    </div>
+  );
+}
+
+function ProjectsSection() {
+  return (
+    <section id="projects" className="rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] -mt-10 sm:-mt-12 md:-mt-14 relative z-10 pt-20 sm:pt-24 md:pt-32 pb-10"
+             style={{ background: "rgba(12,12,12,0.30)", backdropFilter: "blur(2px)" }}>
+      <div className="px-5 sm:px-8 md:px-10">
+        <FadeIn>
+          <div className="flex justify-between items-end max-w-6xl mx-auto mb-6 sm:mb-10">
+            <h3 className="font-medium uppercase tracking-[0.04em] text-[#F4EDDC] leading-none"
+                style={{ fontSize: "clamp(1.5rem, 3.6vw, 3.25rem)" }}>
+              Selected work
+            </h3>
+            <span className="mono text-xs sm:text-sm uppercase tracking-[0.25em] text-[#D7E2EA]/55 hidden sm:inline">2025–2026</span>
+          </div>
+        </FadeIn>
+        <FadeIn>
+          <h2 className="hero-heading font-black uppercase leading-none tracking-tight text-center mb-14 sm:mb-20"
+              style={{ fontSize: "clamp(3rem, 12vw, 160px)" }}>
+            Projects
+          </h2>
+        </FadeIn>
+      </div>
+
+      <div className="px-3 sm:px-6 md:px-10 max-w-7xl mx-auto">
+        {PROJECTS.map((p, i) => (
+          <ProjectCard key={p.n} project={p} idx={i} total={PROJECTS.length}/>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============= RESUME ============= */
+function ResumeSection() {
+  return (
+    <section className="bg-[#F4EDDC] text-[#0C0C0C] px-5 sm:px-8 md:px-10 py-20 sm:py-24 md:py-28 relative overflow-hidden">
+      {/* subtle dot grid */}
+      <div className="absolute inset-0 pointer-events-none"
+           style={{ backgroundImage: "radial-gradient(rgba(12,12,12,0.07) 1px, transparent 1px)", backgroundSize: "22px 22px" }}/>
+      <div className="max-w-6xl mx-auto relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-10 md:gap-16">
+        <FadeIn>
+          <div className="flex flex-col gap-3">
+            <span className="mono text-[11px] uppercase tracking-[0.25em] text-[#0C0C0C]/45">credentials</span>
+            <h2 className="font-black uppercase leading-none tracking-tight text-[#0C0C0C]"
+                style={{ fontSize: "clamp(3rem, 10vw, 9rem)" }}>
+              Résumé
+            </h2>
+            <p className="font-light text-[#0C0C0C]/60 max-w-sm leading-relaxed"
+               style={{ fontSize: "clamp(0.85rem, 1.4vw, 1.05rem)" }}>
+              Electronics &amp; Communication Engineering · VIT Vellore · 2025–2029
+            </p>
+          </div>
+        </FadeIn>
+        <FadeIn delay={0.15}>
+          <Magnet padding={80} strength={4}>
+            <a href="Rangan_Pratik_Borah_Resume.pdf" target="_blank" rel="noreferrer"
+               className="group flex items-center gap-4 border-2 border-[#0C0C0C] rounded-full px-8 py-4 sm:px-10 sm:py-5 transition-all duration-300 hover:bg-[#0C0C0C] hover:text-[#F4EDDC]"
+               style={{ fontSize: "clamp(0.85rem, 1.3vw, 1rem)" }}>
+              <span className="font-medium uppercase tracking-[0.18em]">View Resume</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M7 17L17 7M17 7H7M17 7v10"/>
+              </svg>
+            </a>
+          </Magnet>
+        </FadeIn>
+      </div>
+    </section>
+  );
+}
+
+/* ============= CONTACT FOOTER ============= */
+function ContactSection() {
+  return (
+    <section id="contact" className="pt-32 pb-12 px-6 md:px-10 border-t border-[#D7E2EA]/10" style={{ background: 'rgba(12,12,12,0.28)', backdropFilter: 'blur(2px)' }}>
+      <div className="max-w-6xl mx-auto">
+        <FadeIn>
+          <h3 className="font-medium uppercase tracking-[0.04em] text-[#F4EDDC] leading-none"
+              style={{ fontSize: "clamp(1.5rem, 3.6vw, 3.25rem)" }}>
+            Get in touch
+          </h3>
+        </FadeIn>
+        <FadeIn delay={0.1}>
+          <h2 className="accent-heading font-black uppercase leading-[0.95] tracking-tight mt-6 mb-12"
+              style={{ fontSize: "clamp(2.5rem, 9vw, 9rem)" }}>
+            let&apos;s build<br/>something real.
+          </h2>
+        </FadeIn>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16 pt-8 border-t border-[#D7E2EA]/15">
+          <FadeIn delay={0.05}>
+            <div className="mono text-[11px] uppercase tracking-[0.2em] text-[#D7E2EA]/45 mb-3">email</div>
+            <a href="mailto:ranganpratikborah2006@gmail.com" className="text-[#F4EDDC] text-base sm:text-lg break-words hover:opacity-70">
+              ranganpratikborah2006@gmail.com
+            </a>
+          </FadeIn>
+          <FadeIn delay={0.15}>
+            <div className="mono text-[11px] uppercase tracking-[0.2em] text-[#D7E2EA]/45 mb-3">elsewhere</div>
+            <div className="flex flex-col gap-2">
+              <a href="https://www.linkedin.com/in/rangan-pratik-borah-69957b375/" target="_blank" rel="noreferrer" className="text-[#F4EDDC] text-base sm:text-lg hover:opacity-70">linkedin ↗</a>
+              <a href="https://github.com/RanganBorah" target="_blank" rel="noreferrer" className="text-[#F4EDDC] text-base sm:text-lg hover:opacity-70">github ↗</a>
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.25}>
+            <div className="mono text-[11px] uppercase tracking-[0.2em] text-[#D7E2EA]/45 mb-3">based in</div>
+            <div className="text-[#F4EDDC] text-base sm:text-lg">
+              Vellore, India<br/>
+              <span className="text-[#D7E2EA]/55 text-sm">VIT · ECE · 2025–2029</span>
+            </div>
+          </FadeIn>
+        </div>
+
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mt-20 pt-8 border-t border-[#D7E2EA]/10">
+          <span className="mono text-[11px] uppercase tracking-[0.2em] text-[#D7E2EA]/40">
+            © 2026 Rangan Pratik Borah · built in react + tailwind
+          </span>
+          <ContactButton>say hello</ContactButton>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============= APP ============= */
+function App() {
+  return (
+    <main className="overflow-x-clip" style={{ background: 'transparent' }}>
+      <HeroSection />
+      <MarqueeSection />
+      <AboutSection />
+      <SkillsSection />
+      <ProjectsSection />
+      <ResumeSection />
+      <ContactSection />
+    </main>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
